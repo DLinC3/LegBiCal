@@ -20,6 +20,8 @@ from .invariant_ekf import (
     start_filter,
 )
 
+# -----------------------------------------------------------------------------
+# constants: covariance groups, initialization, regularization weights
 
 GROUP_ORDER = ["gyro", "accel", "gyro_bias", "accel_bias", "contact_proc", "kin_meas"]
 GROUP_COLOR = dict(zip(
@@ -52,6 +54,9 @@ FLOOR = {
 LAMBDA = {"prior": 1e-3, "corr": 1e-3, "cond": 1e-1, "nis": 1e-3}
 BIAS_PRIOR_BOOST = 1000.0
 MAX_LOG_COND = 6.0
+
+# -----------------------------------------------------------------------------
+# config and result containers
 
 
 @dataclass(frozen=True)
@@ -89,7 +94,7 @@ class Rollout:
 
 @dataclass
 class TrainingResult:
-    modules: torch.nn.ModuleDict
+    modules: "CovarianceModel"
     optimizer: torch.optim.Optimizer
     history: list[dict]
     best: dict
@@ -97,6 +102,9 @@ class TrainingResult:
     runtime_s: float
     lr: float
     final_state_dict: dict
+
+# -----------------------------------------------------------------------------
+# environment helpers
 
 
 def project_root(start: Path | None = None) -> Path:
@@ -123,6 +131,9 @@ def assert_cuda_float64(*xs: torch.Tensor) -> None:
         if isinstance(x, torch.Tensor):
             assert x.device.type == "cuda", x.device
             assert x.dtype == torch.float64, x.dtype
+
+# -----------------------------------------------------------------------------
+# covariance model: SPD3 parameterization, one module per noise group
 
 
 class SPD3(torch.nn.Module):
@@ -160,15 +171,63 @@ class SPD3(torch.nn.Module):
         return torch.log(torch.linalg.eigvalsh(self.cov()).clamp_min(self.floor))
 
 
+class CovarianceModel(torch.nn.ModuleDict):
+    """One SPD3 per noise group.
+
+    Subclasses ModuleDict so state-dict keys stay flat ("gyro.raw_tril", ...)
+    and existing checkpoints load unchanged.
+    """
+
+    def __init__(
+        self,
+        *,
+        device: str | torch.device = "cuda",
+        dtype: torch.dtype = torch.float64,
+    ) -> None:
+        super().__init__({
+            name: SPD3([INIT_STD[name]] * 3, floor=FLOOR[name], dtype=dtype, device=device)
+            for name in GROUP_ORDER
+        })
+
+    def covs(self) -> tuple[dict[str, torch.Tensor], torch.Tensor]:
+        """Process covariances keyed Qg/Qa/... plus the kinematic measurement cov."""
+        return build_covs(self)
+
+    def param_groups(self, lr: float, bias_lr_factor: float) -> list[dict]:
+        """Adam param groups: bias groups get a slower, anchored learning rate."""
+        bias = [self[name].raw_tril for name in ("gyro_bias", "accel_bias")]
+        main = [self[name].raw_tril for name in GROUP_ORDER
+                if name not in ("gyro_bias", "accel_bias")]
+        return [
+            {"params": main, "lr": lr},
+            {"params": bias, "lr": lr * bias_lr_factor},
+        ]
+
+    @torch.no_grad()
+    def summary(self) -> dict[str, dict]:
+        """Per-group eigenvalues, conditioning, and correlation (host floats)."""
+        out: dict[str, dict] = {}
+        for name in GROUP_ORDER:
+            C = self[name].cov().detach()
+            eig = torch.linalg.eigvalsh(C)
+            d = torch.sqrt(torch.diagonal(C).clamp_min(1e-30))
+            corr = (C / (d[:, None] * d[None, :])).cpu().numpy()
+            off = corr - np.diag(np.diag(corr))
+            out[name] = {
+                "eigs": eig.cpu().numpy().tolist(),
+                "log_cond": float(torch.log(eig[-1]) - torch.log(eig[0])),
+                "max_abs_offdiag_corr": float(np.abs(off).max()),
+                "cov": C.cpu().numpy().tolist(),
+            }
+        return out
+
+
 def make_cov_modules(
     *,
     device: str | torch.device = "cuda",
     dtype: torch.dtype = torch.float64,
-) -> torch.nn.ModuleDict:
-    return torch.nn.ModuleDict({
-        name: SPD3([INIT_STD[name]] * 3, floor=FLOOR[name], dtype=dtype, device=device)
-        for name in GROUP_ORDER
-    })
+) -> CovarianceModel:
+    return CovarianceModel(device=device, dtype=dtype)
 
 
 def build_covs(modules: torch.nn.ModuleDict) -> tuple[dict[str, torch.Tensor], torch.Tensor]:
@@ -191,6 +250,9 @@ def save_covariances_npz(path: Path, covs: dict[str, torch.Tensor], R_kin: torch
         **{k: v.detach().cpu().numpy() for k, v in covs.items()},
         R_kin_pos=R_kin.detach().cpu().numpy(),
     )
+
+# -----------------------------------------------------------------------------
+# data loading: rollouts, contact schedules, filter seeding
 
 
 def candidate_reliability(
@@ -295,6 +357,9 @@ def seed_state(roll: Rollout, row: int, P0_fixed: torch.Tensor) -> tuple[torch.T
     theta0 = torch.zeros(6, dtype=roll.gt_R_WB.dtype, device=roll.gt_R_WB.device)
     return X0.detach(), theta0, P0_fixed.detach().clone()
 
+# -----------------------------------------------------------------------------
+# replay / eval
+
 
 def eval_replay(
     roll: Rollout,
@@ -349,6 +414,47 @@ def eval_replay(
         return result
 
 
+def evaluate_all(
+    rollout_order: list[str],
+    rollouts: dict[str, Rollout],
+    *,
+    covs_initial: dict[str, torch.Tensor],
+    R_kin_initial: torch.Tensor,
+    covs_calibrated: dict[str, torch.Tensor],
+    R_kin_calibrated: torch.Tensor,
+    P0_fixed: torch.Tensor,
+    s_jitter: float,
+) -> dict:
+    summary = {"rollouts": {}}
+    sse_init = sse_cal = rows_total = 0.0
+    for stem in rollout_order:
+        roll = rollouts[stem]
+        init = eval_replay(roll, covs_initial, R_kin_initial, P0_fixed=P0_fixed,
+                           s_jitter=s_jitter)
+        cal = eval_replay(roll, covs_calibrated, R_kin_calibrated, P0_fixed=P0_fixed,
+                          s_jitter=s_jitter)
+        if not (cal["finite"] and cal["final_P_min_eig"] > -1e-12 and cal["final_P_sym"] < 1e-9):
+            raise FloatingPointError(f"final covariance check failed for {stem}")
+        sse_init += init["sse"]
+        sse_cal += cal["sse"]
+        rows_total += cal["rows"]
+        summary["rollouts"][stem] = {
+            "manifest_split_label": roll.split_label,
+            "rows": cal["rows"],
+            "vB_rmse_initial": init["vB_rmse"],
+            "vB_rmse_calibrated": cal["vB_rmse"],
+            "final_P_min_eig": cal["final_P_min_eig"],
+            "final_P_sym_residual": cal["final_P_sym"],
+            "jitter_events": cal["jitter_events"],
+        }
+    summary["aggregate_vB_rmse_initial"] = float(np.sqrt(sse_init / rows_total))
+    summary["aggregate_vB_rmse_calibrated"] = float(np.sqrt(sse_cal / rows_total))
+    return summary
+
+# -----------------------------------------------------------------------------
+# regularization
+
+
 def reg_log_eig_prior(module: SPD3, prior_std: float, *, device: torch.device) -> torch.Tensor:
     target = 2.0 * torch.log(torch.as_tensor(prior_std, dtype=torch.float64, device=device))
     return ((module.log_eigs() - target) ** 2).mean()
@@ -398,6 +504,9 @@ def covariance_regularization(
     terms["nis"] = LAMBDA["nis"] * reg_nis(nis_values, nis_dims, device=device)
     return total + terms["nis"], terms
 
+# -----------------------------------------------------------------------------
+# training: continuous per-rollout replay, chunked BPTT, one Adam step per chunk
+
 
 def train_trimmed_rollouts(
     rollout_order: list[str],
@@ -409,14 +518,8 @@ def train_trimmed_rollouts(
     torch.manual_seed(0)
     modules = make_cov_modules(device=device, dtype=config.dtype)
     params = list(modules.parameters())
-    bias_params = [modules[name].raw_tril for name in ("gyro_bias", "accel_bias")]
-    main_params = [modules[name].raw_tril for name in GROUP_ORDER
-                   if name not in ("gyro_bias", "accel_bias")]
     optimizer = torch.optim.Adam(
-        [
-            {"params": main_params, "lr": config.lr},
-            {"params": bias_params, "lr": config.lr * config.bias_lr_factor},
-        ],
+        modules.param_groups(config.lr, config.bias_lr_factor),
         betas=(0.9, 0.999),
         eps=1e-8,
     )
@@ -496,21 +599,10 @@ def train_trimmed_rollouts(
             "peak_gb": torch.cuda.max_memory_allocated() / 1e9,
             "epoch_s": time.time() - t_epoch,
             "rows_per_s": total_train_rows / max(time.time() - t_epoch, 1e-12),
-            "groups": {},
+            "groups": modules.summary(),
         }
         for name in GROUP_ORDER:
-            C = modules[name].cov().detach()
-            eig = torch.linalg.eigvalsh(C)
-            d = torch.sqrt(torch.diagonal(C).clamp_min(1e-30))
-            corr = (C / (d[:, None] * d[None, :])).cpu().numpy()
-            off = corr - np.diag(np.diag(corr))
-            rec["groups"][name] = {
-                "eigs": eig.cpu().numpy().tolist(),
-                "log_cond": float(torch.log(eig[-1]) - torch.log(eig[0])),
-                "max_abs_offdiag_corr": float(np.abs(off).max()),
-                "grad_norm_mean": float(torch.stack(grad_norms[name]).mean()),
-                "cov": C.cpu().numpy().tolist(),
-            }
+            rec["groups"][name]["grad_norm_mean"] = float(torch.stack(grad_norms[name]).mean())
         history.append(rec)
         if rec["train_body_loss"] < best["loss"]:
             best = {
@@ -536,6 +628,9 @@ def train_trimmed_rollouts(
         lr=config.lr,
         final_state_dict=final_state,
     )
+
+# -----------------------------------------------------------------------------
+# save / plot / report
 
 
 def run_meta(
@@ -610,44 +705,6 @@ def save_training_outputs(
         "chunk_body_loss_trace": result.chunk_trace,
     }, indent=2))
     return meta
-
-
-def evaluate_all(
-    rollout_order: list[str],
-    rollouts: dict[str, Rollout],
-    *,
-    covs_initial: dict[str, torch.Tensor],
-    R_kin_initial: torch.Tensor,
-    covs_calibrated: dict[str, torch.Tensor],
-    R_kin_calibrated: torch.Tensor,
-    P0_fixed: torch.Tensor,
-    s_jitter: float,
-) -> dict:
-    summary = {"rollouts": {}}
-    sse_init = sse_cal = rows_total = 0.0
-    for stem in rollout_order:
-        roll = rollouts[stem]
-        init = eval_replay(roll, covs_initial, R_kin_initial, P0_fixed=P0_fixed,
-                           s_jitter=s_jitter)
-        cal = eval_replay(roll, covs_calibrated, R_kin_calibrated, P0_fixed=P0_fixed,
-                          s_jitter=s_jitter)
-        if not (cal["finite"] and cal["final_P_min_eig"] > -1e-12 and cal["final_P_sym"] < 1e-9):
-            raise FloatingPointError(f"final covariance check failed for {stem}")
-        sse_init += init["sse"]
-        sse_cal += cal["sse"]
-        rows_total += cal["rows"]
-        summary["rollouts"][stem] = {
-            "manifest_split_label": roll.split_label,
-            "rows": cal["rows"],
-            "vB_rmse_initial": init["vB_rmse"],
-            "vB_rmse_calibrated": cal["vB_rmse"],
-            "final_P_min_eig": cal["final_P_min_eig"],
-            "final_P_sym_residual": cal["final_P_sym"],
-            "jitter_events": cal["jitter_events"],
-        }
-    summary["aggregate_vB_rmse_initial"] = float(np.sqrt(sse_init / rows_total))
-    summary["aggregate_vB_rmse_calibrated"] = float(np.sqrt(sse_cal / rows_total))
-    return summary
 
 
 def plot_diagnostics(
@@ -753,6 +810,9 @@ def summarize_saved_results(out_dir: Path) -> dict:
         "covariance_keys": sorted(np.load(cov_path).files) if cov_path.exists() else [],
         "history_epochs": len(training["history"]),
     }
+
+# -----------------------------------------------------------------------------
+# CLI
 
 
 def _cmd_summarize(args: argparse.Namespace) -> None:

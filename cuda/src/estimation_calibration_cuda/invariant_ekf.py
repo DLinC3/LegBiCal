@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import torch
 
 _SMALL_ANGLE = 1e-4
@@ -450,7 +451,6 @@ def precompute_contact_changes(flags) -> list:
     the full flags array (row 0 of the rollout gets all-True-vs-unknown
     handled by ``start_filter``, so index 0 here is unused at rollout start).
     """
-    import numpy as np
     flags = np.asarray(flags).astype(bool)
     T, N = flags.shape
     changes = [[] for _ in range(T)]
