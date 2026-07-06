@@ -1,8 +1,5 @@
 # GPU Execution Notes
 
-Short release-facing notes for future estimator changes. The longer Chinese
-engineering record is kept locally and is intentionally ignored by git.
-
 ## Core Point
 
 The baseline was already on CUDA. It was slow because it was launch-bound:
@@ -22,18 +19,6 @@ The fast path is:
 - `batched_calibration.py`: batched trainer and `ChunkGraph`.
 - `profile_replay.py`: benchmark and trace harness.
 - `tests/`: required correctness gates.
-
-## Reproduce
-
-```bash
-cd /home/dlc/GitHub/LegBiCal/cuda
-
-PYTHONPATH=src /home/dlc/miniforge3/envs/legged_opt/bin/python -m pytest tests/
-
-PYTHONPATH=src /home/dlc/miniforge3/envs/legged_opt/bin/python \
-  benchmarks/profile_replay.py --impl fixed --batch 7 --rows 300 --chunks 10 \
-  --with-grad --compile cuda-graph --trace
-```
 
 ## Design Rules
 
@@ -56,7 +41,7 @@ PYTHONPATH=src /home/dlc/miniforge3/envs/legged_opt/bin/python \
 - Keep non-capturable regularization outside the graph and add gradients
   explicitly.
 
-## Release Checklist
+## Quick Checklist
 
 - `PYTHONPATH=src python -m pytest tests/` passes.
 - Dynamic oracle parity and gradient parity stay within test gates.
