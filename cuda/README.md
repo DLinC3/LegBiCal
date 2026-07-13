@@ -117,15 +117,14 @@ Dataset identity and every value except the epoch target must match; CUDA graphs
 The dynamic and fixed-slot replays accept optional `contact_process_covariance`.
 Binary flags still control propagation, correction, insertion, and removal.
 
-## Benchmark
+## Core design
 
-Use an external paired dataset and write fresh local evidence:
-
-```bash
-python benchmarks/profile_replay.py --impl fixed --batch 7 --rows 300 \
-  --chunks 10 --repeat 5 --with-grad --compile cuda-graph-compile \
-  --data-root DATASET --out benchmark-output
-```
+- Eight fixed contact slots turn events into masks, so rollouts pad once into one
+  static batch with no data-dependent Python control flow.
+- `torch.compile(fullgraph=True)` fuses the tensor-only EKF step;
+  `cuda-graph-compile` captures fixed-chunk forward/backward replay to cut launch overhead.
+- Cached tensors and gather-based assembly avoid repeated allocation,
+  scatter/atomics, and slow tiny float64 GEMMs while preserving autograd.
 
 ## Limits
 
