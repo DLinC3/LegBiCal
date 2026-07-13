@@ -2,6 +2,15 @@
 
 A compact Torch package for split-safe covariance calibration of a contact-aided invariant EKF.
 
+## Implementation
+
+- Eight fixed contact slots turn events into masks, so rollouts pad once into one
+  static batch with no data-dependent Python control flow.
+- `torch.compile(fullgraph=True)` fuses the tensor-only EKF step;
+  `cuda-graph-compile` captures fixed-chunk forward/backward replay to cut launch overhead.
+- Cached tensors and gather-based assembly avoid repeated allocation,
+  scatter/atomics, and slow tiny float64 GEMMs while preserving autograd.
+
 ## Install
 
 Python 3.10–3.14 and Torch 2.11 or newer are required.
@@ -116,15 +125,6 @@ Dataset identity and every value except the epoch target must match; CUDA graphs
 
 The dynamic and fixed-slot replays accept optional `contact_process_covariance`.
 Binary flags still control propagation, correction, insertion, and removal.
-
-## Core design
-
-- Eight fixed contact slots turn events into masks, so rollouts pad once into one
-  static batch with no data-dependent Python control flow.
-- `torch.compile(fullgraph=True)` fuses the tensor-only EKF step;
-  `cuda-graph-compile` captures fixed-chunk forward/backward replay to cut launch overhead.
-- Cached tensors and gather-based assembly avoid repeated allocation,
-  scatter/atomics, and slow tiny float64 GEMMs while preserving autograd.
 
 ## Limits
 
