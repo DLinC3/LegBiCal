@@ -1,4 +1,4 @@
-# LegBiCal
+# Estimation Calibration
 
 Reference implementations for *Simultaneous Calibration of Noise Covariance
 and Kinematics for State Estimation of Legged Robots via Bi-level
