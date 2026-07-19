@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<config>
+  <paths workspace="." experiment="." descriptions="." data="." results="data/clips/run2/reference_solution" />
+  <robot urdf="models/g1/urdf/g1_custom_collision_29dof.urdf" srdf="" reference_configuration="" />
+  <contacts>
+    <frame name="LL_FOOT_FL" />
+    <frame name="LL_FOOT_FR" />
+    <frame name="LL_FOOT_RL" />
+    <frame name="LL_FOOT_RR" />
+    <frame name="LR_FOOT_FL" />
+    <frame name="LR_FOOT_FR" />
+    <frame name="LR_FOOT_RL" />
+    <frame name="LR_FOOT_RR" />
+  </contacts>
+  <data q="data/clips/run2/q_sense.csv" v="data/clips/run2/v_sense.csv" u="data/clips/run2/tau_sense.csv" q_has_time_column="false" v_has_time_column="false" u_has_time_column="false" torso_base_frame="" joint_order="" normalize_base_quaternion="true" shift_base_to_ground="false" reuse_initial_ground_height="false" average_controls="false" />
+  <solver horizon="501" interval="0.02" down_sample="1" max_iter="100" callbacks="true" start_idx="0" n_thread="8" alpha0="1.0" dry_run="false" />
+  <weights arrival_alpha="40.0" arrival_com="40.0" arrival_diag="40.0" arrival_scale_alpha="10.0" meas_position="400.0" meas_position_z="200.0" meas_orientation="30.0" meas_joint="200.0" meas_linearVel="0.0" meas_angularVel="150.0" meas_jointVel="40.0" meas_params="0.0" dyn_position="20.0" dyn_orientation="20.0" dyn_joint="20.0" dyn_params="0.0" kappa="1000.0" mu="1.0" />
+  <outputs directory="${results}" xs_log="xs_log.csv" us_log="us_log.csv" xs_results="xs_results_fddp.csv" us_results="us_results_fddp.csv" u0_results="u0_results_fddp.csv" inertia_report="inertia_identification.txt" xs_rollout="xs_rollout.csv" force_log="f_rollout.csv" log_initial_guess="true" rollout="true" />
+</config>

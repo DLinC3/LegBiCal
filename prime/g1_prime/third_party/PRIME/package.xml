@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>crocoddyl_contact_id</name>
+  <version>0.1.0</version>
+  <description>
+    Standalone research codebase derived from Crocoddyl with differentiable
+    contact estimation and inertial-parameter identification extensions.
+  </description>
+  <!-- TODO: replace this placeholder before publishing a ROS package. -->
+  <maintainer email="contact-id-maintainers@example.com">Contact-ID Maintainers</maintainer>
+
+  <!-- Please refer to README.md, NOTICE.md, AUTHORS.md, and THIRD_PARTY_NOTICES.md. -->
+  <license>BSD-3-Clause</license>
+
+  <url type="website">https://github.com/loco-3d/crocoddyl</url>
+  <url type="repository">TODO: add repository URL before release</url>
+
+  <build_depend>git</build_depend>
+  <build_depend>doxygen</build_depend>
+  <doc_depend>doxygen</doc_depend>
+  <doc_depend>texlive-latex-base</doc_depend>
+  <!-- The following tag is recommended by REP-136 -->
+  <exec_depend condition="$ROS_VERSION == 1">catkin</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">ament_cmake</exec_depend>
+  <depend>python3</depend>
+  <depend>python3-numpy</depend>
+  <depend>coinor-libipopt-dev</depend>
+  <test_depend>python3-scipy</test_depend>
+  <depend>boost</depend>
+  <depend>eigenpy</depend>
+  <depend>example-robot-data</depend>
+  <depend>pinocchio</depend>
+
+  <buildtool_depend>cmake</buildtool_depend>
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

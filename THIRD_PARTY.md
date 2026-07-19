@@ -3,10 +3,14 @@
 The repository is distributed under the root MIT license except where a file
 or subtree carries its own notice.
 
-- `prime/vendor/PRIME/` is a compact derivative of
+- `prime/stride_prime/vendor/PRIME/` is a compact derivative of
   [well-robotics/PRIME](https://github.com/well-robotics/PRIME), pinned from
   commit `b848ceecd451f4786ce39dcefa59e96dbaa369ba`. It retains the BSD
-  3-Clause notice in `prime/vendor/PRIME/LICENSE` and includes Crocoddyl code.
+  3-Clause notice in `prime/stride_prime/vendor/PRIME/LICENSE` and includes
+  Crocoddyl code.
+- `prime/g1_prime/third_party/PRIME/` is the independently pinned PRIME subset
+  used by the G1 calibration implementation. Its BSD 3-Clause license and
+  vendoring record are retained in that subtree.
 - CasADi, Fatrop, Pinocchio, Eigen, Boost, NumPy, SciPy, CVXPY, and Torch are
   external dependencies and are not relicensed here.
 - `matlab/data/stride_demo.mat` contains project experiment signals and

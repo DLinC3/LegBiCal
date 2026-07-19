@@ -1,0 +1,65 @@
+{
+  "action_alignment": "transition k->k+1 uses source torque row k+1",
+  "invalid_final_row_excluded": true,
+  "clip": "run2",
+  "lower_measurement_realization": {
+    "mode": "contiguous_slice_of_frozen_noise_realization",
+    "source_rows_control": [575, 1075],
+    "source_rows_state": [575, 1076]
+  },
+  "lower_visible_files": [
+    "q_sense.csv",
+    "v_sense.csv",
+    "tau_sense.csv",
+    "prior_state.csv"
+  ],
+  "model_profile_id": "g1",
+  "motion": "run2_subject1",
+  "note": "sensor CSVs trimmed to the released 501-state window",
+  "prior_state_override": null,
+  "schema": "g1cal_noise_injection_v2",
+  "seed": 8901,
+  "sigma_by_block": {
+    "p0_base_angular_velocity": 0.1000000499999875,
+    "p0_base_linear_velocity": 0.1000000499999875,
+    "p0_base_orientation": 0.05000002499999375,
+    "p0_base_xy": 0.05000002499999375,
+    "p0_base_z": 0.03000001499999625,
+    "p0_joint_position": 0.03000001499999625,
+    "p0_joint_velocity": 0.200000099999975,
+    "q_base_force": 80.00000249999995,
+    "q_base_torque": 20.000000624999988,
+    "q_joint_torque": 12.000000374999994,
+    "r_base_angular_velocity": 0.05000002499999375,
+    "r_base_linear_velocity": 0.05000002499999375,
+    "r_base_orientation": 0.0200000099999975,
+    "r_base_xy": 0.01000000499999875,
+    "r_base_z": 0.01000000499999875,
+    "r_joint_position": 0.01000000499999875,
+    "r_joint_velocity": 0.1000000499999875
+  },
+  "source_rows": [
+    575,
+    1076
+  ],
+  "injection_theta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.3862943611198906,
+    1.3862943611198906,
+    1.3862943611198906,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "upper_truth_file": "upper_truth_h501.csv"
+}

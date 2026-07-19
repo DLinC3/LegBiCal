@@ -1,0 +1,26 @@
+{
+  "covariance_config_hash": "0b47ac6557138efac8e8f02906bc49f8ca1d5eff3fafa333d83ba904e6ecec8b",
+  "loss_schema": "se3_log_v2",
+  "schema": "g1cal_theta_v1",
+  "sigma_r_joint_position_rad": 0.03994458789577521,
+  "theta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.3862943611198906,
+    1.3862943611198906,
+    1.3862943611198906,
+    0.0,
+    0.0,
+    0.0,
+    1.3849080667587708,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "theta_bytes_hash": "2d52b1bf858008052968d447596ac8c3e8421cc0df46a1a25ff8c7c43667afce"
+}

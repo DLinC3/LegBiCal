@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g1cal"
+version = "1.0.0"
+description = "Bilevel covariance calibration for a G1 humanoid state estimator (built on the PRIME estimator)"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "pyyaml",
+    "meshcat",
+    "mujoco>=3.0",
+    "pillow",
+    "cvxpy",
+    "scs",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.scripts]
+g1cal = "g1cal.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "python" }
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.setuptools.package-data]
+g1cal = ["*.so"]

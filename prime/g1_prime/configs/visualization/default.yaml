@@ -1,0 +1,39 @@
+schema: g1cal_visualization_style_v2
+style:
+  # Physical force-arrow contract: 200 N renders as 0.10 m.
+  force_scale_m_per_n: 0.0005
+  force_display_threshold_n: 5.0
+  cop_min_normal_force_n: 5.0
+  friction_warning: 0.80
+  friction_critical: 0.95
+  # Arrow prominence: unlit saturated colors, thicker shafts/heads.
+  arrow_unlit: true
+  corner_shaft_radius_m: 0.007
+  corner_head_radius_m: 0.018
+  foot_sum_radius_scale: 2.0
+  # Markers kept lighter than the force arrows.
+  cop_radius_m: 0.018
+  cop_color: "#009E73"
+  support_polygon_color: "#8899AA"
+  support_polygon_opacity: 0.6
+  support_polygon_radius_m: 0.004
+  # Checker floor matching the PRIME experiment MJCF groundplane
+  # (rgb1=0.2 0.3 0.4, rgb2=0.1 0.2 0.3, markrgb=0.8), with thanks to the
+  # PRIME authors.
+  floor_checker: true
+  floor_rgb1: "#334D66"
+  floor_rgb2: "#1A334D"
+  floor_mark_rgb: "#CCCCCC"
+  floor_cell_m: 0.4
+  robot_gt_opacity: 0.25
+  colors:
+    robot_estimated: "#B8B8B8"
+    robot_gt: "#56B4E9"
+    prime_left: "#0072B2"
+    prime_right: "#E69F00"
+    mujoco_gt: "#CC79A7"
+    normal: "#009E73"
+    tangential: "#D55E00"
+    warning: "#F0E442"
+    invalid: "#D55E00"
+    barrier_tail: "#666666"

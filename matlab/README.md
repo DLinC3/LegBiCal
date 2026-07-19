@@ -1,25 +1,25 @@
-# MATLAB
+# MATLAB implementation
 
 This implementation combines a stage-structured Fatrop full-information
 estimator with an adjoint KKT gradient. SQP--BFGS, Frank--Wolfe, and projected
-Adam are provided as interchangeable upper-level updates. The included MAT
-file contains the trajectory and precomputed kinematic quantities required by
-the example.
+Adam are interchangeable upper-level updates for covariance and kinematic
+calibration.
 
-<p align="center">
-  <img src="assets/fig4_upper_level.svg" width="68%" alt="Upper-level loss convergence">
-</p>
-<p align="center"><sub>Upper-level loss convergence for the fast and contact-aware FIEs; see the <a href="../prime/">PRIME implementation</a>.</sub></p>
+## Contents
 
-<p align="center">
-  <img src="assets/fig5_stride.svg" width="76%" alt="Joint covariance and kinematic calibration">
-</p>
-<p align="center"><sub>Joint covariance and kinematic calibration on STRIDE.</sub></p>
+| Path | Responsibility |
+|---|---|
+| [`+legbical/`](+legbical/) | MATLAB package containing calibration, configuration, and estimation code |
+| [`assets/`](assets/) | Paper figures generated from the experiments |
+| [`data/`](data/) | STRIDE example signals and precomputed kinematic quantities |
+| [`tests/`](tests/) | Fast-FIE regression test |
+| [`run_calibration.m`](run_calibration.m) | Calibration entry point |
+| [`setup.m`](setup.m) | Local MATLAB path setup |
 
 ## Run
 
-MATLAB, Optimization Toolbox, and a CasADi build with Fatrop are required. If
-CasADi is not already on the MATLAB path, set `CASADI_MATLAB_PATH`.
+MATLAB, Optimization Toolbox, and a CasADi build with Fatrop are required. Set
+`CASADI_MATLAB_PATH` when CasADi is not already on the MATLAB path.
 
 ```matlab
 cd matlab
@@ -35,3 +35,5 @@ complete stored trajectory.
 addpath('tests');
 test_fast_fie
 ```
+
+Return to the [repository overview](../README.md).

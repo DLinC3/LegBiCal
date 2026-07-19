@@ -1,0 +1,11 @@
+{
+  "acknowledgment": "Solved with the PRIME estimator (well-robotics/PRIME); thanks to the PRIME authors for their excellent work.",
+  "clip": "run1",
+  "schema": "g1cal_reference_solution_v1",
+  "solver": {
+    "horizon": 501,
+    "n_thread": 8,
+    "newton_max_iters": 1000
+  },
+  "statement": "Converged lower-level estimate at the calibrated covariance (sigma_r_joint_position = 0.039944588 rad), shipped so the quickstart can initialize/render immediately."
+}

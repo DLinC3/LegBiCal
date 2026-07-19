@@ -1,0 +1,16 @@
+{
+  "schema": "g1cal_mujoco_capsule_contact_frames_v1",
+  "authority": "derived from models/g1/mjcf/g1.xml",
+  "derivation": "bottom points of the y=-0.01 and y=+0.01 longitudinal foot capsules",
+  "units": "m",
+  "frames": {
+    "LL_FOOT_FL": {"parent": "left_ankle_roll_link", "xyz": [0.130, 0.010, -0.035]},
+    "LL_FOOT_FR": {"parent": "left_ankle_roll_link", "xyz": [0.130, -0.010, -0.035]},
+    "LL_FOOT_RL": {"parent": "left_ankle_roll_link", "xyz": [-0.052, 0.010, -0.035]},
+    "LL_FOOT_RR": {"parent": "left_ankle_roll_link", "xyz": [-0.052, -0.010, -0.035]},
+    "LR_FOOT_FL": {"parent": "right_ankle_roll_link", "xyz": [0.130, 0.010, -0.035]},
+    "LR_FOOT_FR": {"parent": "right_ankle_roll_link", "xyz": [0.130, -0.010, -0.035]},
+    "LR_FOOT_RL": {"parent": "right_ankle_roll_link", "xyz": [-0.052, 0.010, -0.035]},
+    "LR_FOOT_RR": {"parent": "right_ankle_roll_link", "xyz": [-0.052, -0.010, -0.035]}
+  }
+}

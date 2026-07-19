@@ -1,0 +1,64 @@
+cff-version: 1.2.0
+title: "PRIME: Physically-consistent Robotic Inertial and Motion Estimation for Legged and Humanoid Robots"
+message: "If you use this code, please cite PRIME and the upstream Crocoddyl paper."
+type: software
+license: BSD-3-Clause
+repository-code: "TODO: add repository URL before release"
+authors:
+  - family-names: Kang
+    given-names: Jiarong
+  - family-names: Ren
+    given-names: Kunzhao
+  - family-names: Pang
+    given-names: Tao
+  - family-names: Xiong
+    given-names: Xiaobin
+abstract: >
+  PRIME reconstructs physically consistent robot trajectories, contact forces,
+  and inertial parameters for legged and humanoid robots using differentiable
+  contact dynamics and parameter full-information estimation.
+preferred-citation:
+  type: article
+  title: "PRIME: Physically-consistent Robotic Inertial and Motion Estimation for Legged and Humanoid Robots"
+  authors:
+    - family-names: Kang
+      given-names: Jiarong
+    - family-names: Ren
+      given-names: Kunzhao
+    - family-names: Pang
+      given-names: Tao
+    - family-names: Xiong
+      given-names: Xiaobin
+  year: 2026
+  doi: "10.48550/arXiv.2605.17681"
+  url: "https://arxiv.org/abs/2605.17681"
+  identifiers:
+    - type: other
+      value: "arXiv:2605.17681"
+references:
+  - type: conference-paper
+    title: "Crocoddyl: An Efficient and Versatile Framework for Multi-Contact Optimal Control"
+    authors:
+      - family-names: Mastalli
+        given-names: Carlos
+      - family-names: Budhiraja
+        given-names: Rohan
+      - family-names: Merkt
+        given-names: Wolfgang
+      - family-names: Saurel
+        given-names: Guilhem
+      - family-names: Hammoud
+        given-names: Bilal
+      - family-names: Naveau
+        given-names: Maximilien
+      - family-names: Carpentier
+        given-names: Justin
+      - family-names: Righetti
+        given-names: Ludovic
+      - family-names: Vijayakumar
+        given-names: Sethu
+      - family-names: Mansard
+        given-names: Nicolas
+    conference:
+      name: "IEEE International Conference on Robotics and Automation"
+    year: 2020

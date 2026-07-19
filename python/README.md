@@ -1,13 +1,20 @@
-# Python
+# Python implementation
 
-Three-dimensional bilevel calibration for the B1 platform. A stage-structured
-Fatrop FIE forms the lower level; a sparse adjoint supplies the first-order
-gradient; and a semidefinite Frank--Wolfe oracle updates covariance and
-kinematic parameters.
+This hardware-oriented B1 implementation uses a stage-structured Fatrop FIE,
+a sparse adjoint, and a semidefinite Frank--Wolfe oracle to calibrate
+covariance and kinematic parameters.
 
-The fixed-window solver, primal/dual warm start, derivative functions, KKT
-factorization, and convex oracle are reused. Data, URDF, and portable generated
-C sources are packaged under `bilevel/resources`; native kinematic functions
+## Contents
+
+| Path | Responsibility |
+|---|---|
+| [`bilevel/`](bilevel/) | Estimator, sensitivity, calibration, robot, data, and generated-code modules |
+| [`tests/`](tests/) | Optimization and integration tests |
+| [`tools/`](tools/) | Maintainer utility for regenerating portable kinematic C code |
+
+The repository-root [`pyproject.toml`](../pyproject.toml) owns this package and
+the `estimation-calibration` command. Data, URDF, and portable generated C
+sources are packaged under `bilevel/resources/`; native kinematic functions
 are compiled once into the user cache.
 
 ## Run
@@ -19,11 +26,14 @@ python -m pip install -e '.[dev]'
 estimation-calibration --horizon 3000 --iterations 75
 ```
 
-CasADi must include the Fatrop plugin. CLARABEL is the default open-source LMO
-solver; another CVXPY solver can be selected with `--lmo-solver`.
+CasADi must provide the Fatrop plugin. CLARABEL is the default open-source
+linear minimization oracle; select another installed CVXPY solver with
+`--lmo-solver`.
 
 ## Test
 
 ```bash
 pytest python/tests
 ```
+
+Return to the [repository overview](../README.md).

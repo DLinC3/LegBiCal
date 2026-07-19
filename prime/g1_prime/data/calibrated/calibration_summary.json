@@ -1,0 +1,29 @@
+{
+  "aggregate_se3_log_loss": {
+    "calibrated": 0.013564704611573133,
+    "initial": 0.013567787042362842
+  },
+  "gradient": "whole-estimator central finite difference in the released direction",
+  "optimizers": [
+    "sqp-bfgs",
+    "frank-wolfe-sdp"
+  ],
+  "per_clip_se3_log_loss": {
+    "run1": {
+      "calibrated": 0.011788640734378887,
+      "initial": 0.011790493738734356
+    },
+    "run2": {
+      "calibrated": 0.015340768488767378,
+      "initial": 0.015345080345991328
+    }
+  },
+  "released_block": {
+    "index": 13,
+    "name": "r_joint_position",
+    "sigma_rad": 0.03994458789577521,
+    "theta13": 1.3849080667587708
+  },
+  "schema": "g1cal_calibration_summary_v1",
+  "statement": "The covariance was calibrated by directly minimizing the SE(3)-log trajectory loss on the two released 501-state running clips; no accuracy beyond these two clips is claimed."
+}
