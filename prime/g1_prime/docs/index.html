@@ -12,7 +12,7 @@
     .toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 12px 14px; }
     .copy { min-width: 0; }
     h1 { margin: 0; font-size: clamp(1.05rem, 2.4vw, 1.45rem); font-weight: 650; }
-    .legend { margin: 5px 0 0; color: #aebfce; font-size: .9rem; line-height: 1.35; }
+    .legend { margin: 3px 0 0; color: #aebfce; font-size: .86rem; line-height: 1.3; }
     h2 { margin: 0 0 12px; font-size: 1rem; text-transform: lowercase; }
     .segment-grid { display: grid; grid-template-columns: repeat(2, minmax(190px, 1fr)); gap: 8px; flex: 0 0 auto; }
     .segment { padding: 9px 10px; background: #162331; border: 1px solid #2b4053; border-radius: 8px; }
@@ -23,7 +23,6 @@
     button:hover, button:focus-visible { filter: brightness(1.13); }
     .viewer { padding: 0; overflow: hidden; background: #000; border-top: 1px solid #2b4053; }
     iframe { display: block; width: 100%; height: calc(100vh - 132px); min-height: 540px; border: 0; background: #000; }
-    footer { margin-top: 22px; color: #aebfce; text-align: center; font-size: .9rem; }
     a { color: #56b4e9; }
     @media (max-width: 900px) {
       .toolbar { align-items: stretch; flex-direction: column; }
@@ -39,7 +38,9 @@
     <div class="toolbar">
       <div class="copy">
         <h1>Calibrated Contact-Aware Full-Information Estimation</h1>
+        <p class="legend">Built on the excellent work of <a href="https://arxiv.org/abs/2605.17681">Kang et al.</a>—<a href="https://github.com/well-robotics/PRIME">PRIME</a> (BSD-3-Clause).</p>
         <p class="legend">The light-gray robot is the calibrated estimate; the translucent blue robot is the ground-truth reference.</p>
+        <p class="legend">Blue/yellow arrows: estimated left/right contact forces; pink: ground-truth foot forces; green point: estimated CoP.</p>
       </div>
 
       <div class="segment-grid">
@@ -66,11 +67,6 @@
     </div>
   </section>
 
-  <footer>
-    Built on the excellent work of
-    <a href="https://arxiv.org/abs/2605.17681">Kang et al.</a>—<a href="https://github.com/well-robotics/PRIME">PRIME</a>
-    (BSD-3-Clause).
-  </footer>
 </main>
 <script>
   const segments = [

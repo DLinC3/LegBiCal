@@ -2,8 +2,9 @@
 
 [`index.html`](index.html) immediately loads the first of two self-contained G1
 Meshcat replays. Its compact toolbar identifies the estimated and ground-truth
-robots and selects the segment and speed; generated replay HTML is not stored
-in Git history.
+robots, contact forces, center of pressure, and PRIME attribution while
+selecting the segment and speed. Generated replay HTML is not stored in Git
+history.
 
 ## Build locally
 
