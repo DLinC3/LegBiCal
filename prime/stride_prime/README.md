@@ -4,6 +4,10 @@ Contact-aware covariance and shin-geometry calibration for the planar STRIDE
 model. A native PRIME FDDP estimator supplies trajectories and local dynamics;
 Python computes the upper loss, sensitivity, and parameter update.
 
+The robot model and example data use
+[well-robotics/STRIDE](https://github.com/well-robotics/STRIDE/tree/main); see
+the [STRIDE paper (arXiv:2407.02648)](https://arxiv.org/abs/2407.02648).
+
 ## Contents
 
 | Path | Responsibility |

@@ -4,6 +4,10 @@ A stage-structured Fatrop full-information estimator with an adjoint KKT
 gradient. SQP--BFGS, Frank--Wolfe, and projected Adam share the same covariance
 and kinematic calibration problem.
 
+The example signals and precomputed kinematics use
+[well-robotics/STRIDE](https://github.com/well-robotics/STRIDE/tree/main); see
+the [STRIDE paper (arXiv:2407.02648)](https://arxiv.org/abs/2407.02648).
+
 ## Contents
 
 | Path | Responsibility |
