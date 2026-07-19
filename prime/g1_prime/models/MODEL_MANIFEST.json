@@ -16,7 +16,7 @@
       },
       "urdf": {
         "path": "g1/urdf/g1_custom_collision_29dof.urdf",
-        "sha256": "00fc1639552cc5714db92ddebf5efb0c02c7e14dcedd24c88596b733989b5964"
+        "sha256": "c826e550570dc572c3e486286ed269f192c52acda7446367c9fe3514a0edc143"
       }
     }
   },
